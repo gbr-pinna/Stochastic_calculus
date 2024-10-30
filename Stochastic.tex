@@ -1,0 +1,1300 @@
+\documentclass[11pt,a4paper]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{dsfont}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{natbib}
+\usepackage{dirtytalk}
+\newtheorem{theorem}{Theorem}
+
+\setlength{\parindent}{0pt}
+
+% Geometry setup
+\geometry{margin=1in}
+
+% Header and Footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{\thepage}
+\fancyfoot[C]{}
+
+% Section Title Format
+\titleformat{\section}
+  {\normalfont\Large\bfseries}{\thesection}{1em}{}
+
+% Custom Commands
+\newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
+
+% Document
+\begin{document}
+
+\title{Stochastic calculus}
+\author{Gabriele Pinna}
+\date{\today}
+
+\maketitle
+
+\tableofcontents
+\newpage
+
+\section{Introduction: Conditional expectation and Martingales}
+This is a summary on stochastic calculus following mostly:
+\begin{itemize}
+    \item \say{\textit{Introduction to stochastic calculus with applications}}
+    \item \say{\textit{Stochastic processes and applications
+    }} by G.A. Pavliotis.
+\end{itemize}
+First we introduce some useful definitions such as conditional expectations and martingales which are stochastic processes that model fair games.
+
+\subsection{Conditional expectation}
+Usually, we think of conditional expectation as a non-random variable. Given to random variables $X$ and $Y$ let $f_{X,Y}(x,y)$ be the joint distribution, we define the conditional distribution as $f_{X|Y}(x|y) = \frac{f_{X,Y}(x,y)}{f_{Y}(y)}$ from which we have Bayes' theorem
+\begin{equation}
+f_{X|Y}(x|y)   = \frac{f_{Y|X}(y|x)f_{X}(x)}{f_{Y}(y)} \hspace{5pt}.
+\end{equation}
+
+We define the conditional expectation as
+
+\begin{equation}
+    \mathbb{E}[X|Y=y] = \int_{\mathbb{R}} dx x f_{X|Y}(x|y)
+\end{equation}
+
+this is a number which can be thought of as the best guess for the ranodm variable $X$ given the information that another random variable $Y$ takes the value $y$. We can turn this expectation into a random variable, which reflects the outcome of an experiment where the random variable $X$ is drawn subject to a random constraint represented by a random variable $Y$. This defines a new random variable which is also called \say{expectation value}
+
+\begin{equation}
+    E[X|Y] = \int_{\mathbb{R}} dx x f_{X|Y}(x|Y)
+\end{equation}
+
+this is a random variable that depends on the random variable $Y$.
+We can then calculate the expectation value of this random variable
+
+\begin{equation}
+    \mathbb{E}_{Y}[E[X|Y]] = \int_{\mathbb{R}} dy  \mathbb{E}[X|Y=y] f(y) =  \int_{\mathbb{R}} dy   \int_{\mathbb{R}} dx x f_{X|Y}(x|y) f(y) = \mathbb{E}_{X,Y}[X]
+\end{equation}
+
+which is the same as the expectation value of $X$; this is because we are averaging over all possible values of the constrain $Y$.
+
+In general, let $\mathcal{F}_n = X_1,X_2,...,X_n$ be a sequence of events (random variabels) where the index labels time and $\mathcal{F}_0$ represent the lack of information. We require the conditional expectation to satisfy the property
+
+\begin{itemize}
+    \item $E[Y|\mathcal{F}_0] = Y$
+    \item $E[Y|\mathcal{F}_n] = f(X_1,...,X_n)$
+\end{itemize}
+
+if the second condition is satisfied we say that $Y$ is $\mathcal{F}_n$-measurable which means that the conditional expectation depends only on the information available at time $n$. Additionally, it satisfies properties like 
+
+\begin{itemize}
+    \item Linearity: $E[aY_1+bY_2|\mathcal{F}] = aE[Y_1|\mathcal{F}]+b E[Y_2|\mathcal{F}]$
+    \item Projection: if $m<n$ $E[E[X|\mathcal{F}_n]|\mathcal{F}_m] = E[X|\mathcal{F}_m]$
+\end{itemize}
+
+\subsection{Martingales}
+
+A martingale is a stochastic process $\{M_1,M_2,...\}$ that satisfies
+
+\begin{itemize}
+    \item For each $n$ $M_n$ is a $\mathcal{F}_n$-measurable with $\mathbb{E}[|M_n|]<\infty$
+    \item If $m<n$ we have $E[M_n|\mathcal{F}_m] = M_m \implies E[M_n-M_m|\mathcal{F}_m] = 0$
+\end{itemize}
+
+the second condition means that the conditional expectation based on information up to time $m$ is the random variable at time $m$. Martingales model fair games; in fact, the expectation value does not depend on what happened in the past. Using the tower property we find for a martingale 
+
+\begin{equation}
+    \mathbb{E}[M_{n}] = \mathbb{E}[E[M_{n}|\mathcal{F}_0]] =  \mathbb{E}[M_{0}]
+\end{equation}
+
+
+Similarly we define, with $m<n$,
+
+\begin{itemize}
+    \item Supermartingale:  $E[M_n|\mathcal{F}_m] \leq M_m$
+    \item Submartingale:  $E[M_n|\mathcal{F}_m] \geq M_m$
+\end{itemize}
+
+a supermartingale models a game that is not convenient, whereas a submartingale models a game that is convenient.
+
+\subsubsection{Examples}
+
+Let $\{X_j\}_{j=1}^n$ be $n$ independent random variables with $\mathbb{E}[X_j]=0$, and $S_n = \sum_{j=1}^n X_j$, then $S_n$ is a martingale: $E[S_n|\mathcal{F}_m] = S_n$ $\forall n >m$. 
+
+Let $\mathbb{E}[X^2_j] = \sigma_j^2$ and $A_n = \sum_{\sigma^2_j}$; then, $M_n = S^2_n-A_n$ is a martingale.
+
+\subsection{Markov process}
+ 
+Another important stochastic process is a Markov process which satisfies the Markov property.
+
+Let $m<n$ and $\mathcal{F}_m$ be a filtration, then the (discrete) stochastic process $\{X_j\}$ satisfied the Markov property if
+\begin{equation}
+    P(X_{n+1} = x_{n+1}|X_1 = x_1,X_2=x_2,..,X_{n}=x_n) = P(X_{n+1} = x_{n+1}|X_n=x_n)
+\end{equation}
+this implies that the knowledge of the past does not affect the probability.
+\subsection{Discrete stochastic integral}
+
+We introduce the concept of stochastic integral with an example.
+Consider $\{M_j\}$ to be a martingale where $M_j$ is the asset price at time-step $j$ (cumulative). Assume that at each time-step we place a series of bets $\{B_j\}$, regarding wether the asset price will go up or down. We allow for negative bet which means that we are betting on the price of the asset to go down. The money won at this game at time-step $n$ is given by
+\begin{equation}
+    W_n = \sum_{j=1^{n}}(M_j-M_{j-1})B_j
+\end{equation}
+
+we now proved that under some assumptions $W_n$ is also a martingale. We assume that $B_j$ is bounded $B_j<\infty$ and that it is $\mathcal{F}_{n-1}$-measurable; this means that we can adjust the bet based on how well we are doing. It follows that $\mathbb{E}[W_n]<\infty$; next we need to prove that $E[W_{n+1}|\mathcal{F}_n] = W_{n}$.
+
+\begin{eqnarray*}
+    E[W_{n+1}|\mathcal{F}_n] &=&  E[W_{n}+(M_{n+1}-M_n)B_{n+1}|\mathcal{F}_n] =   E[W_{n}|\mathcal{F}_n]+E[(M_{n+1}-M_n)B_{n+1}|\mathcal{F}_n] \\
+    &=& W_n + B_{n+1}E[(M_{n+1}-M_n)|\mathcal{F}_n] = W_n
+\end{eqnarray*}
+
+Hence, $W_n$ is a martingale; thus, we we are not beating the fair game in a finite amount of time. The quantity $W_n$ is a discrete stocashtic integral. 
+\subsubsection{Martingale betting strategy}
+As an aside, consider a coin toss with $\mathbb{P}[X_j = 1] = \mathbb{P}[X_j = -1] = 1/2$. We are going to find a strategy to beat this fair game but it requires an infinite amount of time. We consider betting $1$ on the first time, if we win we quit otherwise we double the bet on the next game and so on. We can see that if we win at the $n$-th turn we make $2^{n-1}$ but we have lost $\sum_{j=1}^{n-2}2^j = (2^{n-1}-1)/(2-1) = 2^{n-1}-1$; thus we can see that we gain $1$. With probability one, eventually we will win a game; therefore, we are guaranteed to win $1$. In general, we cannot beat a martingale in a finite amount of time but we could in an infinite amount of time.
+
+\subsubsection{Optional stopping time theorem}
+
+The fact that a martingale cannot be beaten in a finite time is the content of a theorem known as \textit{optional stopping time theorem}. A stopping time $T$ with respect to a filtration $\{\mathcal{F}_n\}$ is defined to be a non-negative random variable such that for each $n$ the event $T=n$ is $\mathcal{F}_n$-measurable. 
+In general, the stopping time $T$ is used when after some time $T$ has passed we stop betting.
+For exammpe, let
+
+\begin{equation}
+M_{n \wedge T} = M_0 + \sum_{j=1}^{n}B_j(M_j-M_{j-1})
+\end{equation}
+
+be a martingale that denotes a betting strategy where $B_j=1$ if $j<T$ or $0$ otherwise. The optional sampling theorem says that $M_{n \wedge T}$ is a martingale ($\mathbb{E}[M_{n \wedge T}]  =   \mathbb{E}[M_0]$) and if  $T$ is bounded, $\mathbb{P}[T<k] = 1$, then 
+
+\begin{equation}
+\mathbb{E}[M_T]  =   \mathbb{E}[M_0]
+\end{equation}
+
+\subsubsection{Martingale convergence theorem}
+
+Let $M_n$ be a martingale with respect to a filtration $\mathcal{F}_n$ and $\mathbb{E}[M_n] \leq C$ then there exists a random variable $M_{\infty}$ such that with probability one 
+\begin{equation}
+    \lim_{n \to \infty}M_n = M_{\infty}
+\end{equation}
+
+
+
+
+\section{Wiener process}
+A Wiener process, also calles Brownian motion, can be viewed as the limit of random walk as the time and space increments tend to zero. Let's consider an example where $P[X_j = 1] =  P[X_j = -1] = 1/2$ and let $S_n = \sum_{1 \leq j \leq n} X_j $bì be the random walk. We view the label $j$ as time-steps and the value of $X_j$ as space which in this case increment by $\pm 1$. We can geenralise it considering a generic time $t = N \Delta t$ and a generic space-increment $\Delta x$, after time $t$ the total space increment is
+
+\begin{equation}
+    W_n = \Delta x S_n
+\end{equation}
+
+we would like to scale $\Delta x$ such that $Var[W_n]=1$,i.e. $(\Delta_x)^2 = n/2 = N \Delta t/2 $. Hence, we need $\Delta x \sim  \sqrt{\Delta t}$.
+We now present a rigorous definition.
+
+\subsection{Definition and properties}
+A Wiener process is a stochastic process $B_t$ (sometimes denoted $W_t$) such that
+
+\begin{itemize}
+    \item \textbf{Stationary increments.} If $s < t$, then the distribution of $B_t - B_s$ is the same as that of $B_{t-s} - B_0$.
+    \item \textbf{Independent increments.} If $s < t$, the random variable $B_t - B_s$ is independent of the values $B_r$ for $r \leq s$.
+    \item \textbf{Continuous paths.} The function $t \mapsto B_t$ is a continuous function of $t$.
+\end{itemize}
+
+A stochastic process with stationary and independent increments is known as Levy process.
+
+One can prove, that if $B_t$ is a process satisfying the three conditions above, then the distribution of $B_t$ for each $t$ must be normal $\mathcal{N}(\mu,\sigma^2)$. This is done
+
+Using the properties we obtain
+
+\begin{equation}
+\mathbb{E}[B_t] = \mathbb{E}[B_s]+ \mathbb{E}[B_t-B_s] = \mathbb{E}[B_s]+ \mathbb{E}[B_{t-s}] \implies \mathbb{E}[B_t] = t \mu
+\end{equation}
+
+and similarly $Var[B_t] = t \sigma^2$. An important property is the self-similarity: if $W_t$ is a Wiener process so is $1/\sqrt{c}W_{ct}$. It follows from the fact that if $X \sim \mathcal{N}(0,1)$ then  $\sigma X +M  \sim \mathcal{N}(M,\sigma^2)$. It is costumary to define the standard Brownian motion with mean $0$ and variance $1$ and $B_0=0$ almost surely. 
+
+Using these definitions we can calculate $\mathbb{E}[W_tW_s]$ assuming $s>t$ we get $\mathbb{E}[W_tW_s] = \mathbb{E}[W_t(W_t+W_s-W_t)] = \mathbb{E}[(W_t)^2] \mathbb{E}[W_t(W_s-W_t)]$
+since $s>t$ $W_t$ is independent of $W_s-W_t$ and thus $\mathbb{E}[W_t(W_s-W_t)] = \mathbb{E}[W_t]\mathbb{E}[(W_s-W_t)] = 0$ and we thus get $\mathbb{E}[W_tW_s] = min(t,s)$. 
+
+We can show that $(W_t)^2-t$ is a martingale.
+Assume $s<t$
+\begin{eqnarray}
+    E[(W_t)^2|\mathcal{F}_s] = E[(W_s)^2|\mathcal{F}_s] + E[(W_t-W_s)^2|\mathcal{F}_s] + 2E[W_s(W_t-W_s)|\mathcal{F}_s] = (W_s)^2 +t-s
+\end{eqnarray}
+
+thus
+\begin{equation}
+    E[(W_t)^2-t|\mathcal{F}_s] = (W_s)^2-s  \hspace{5pt}.  
+\end{equation}
+
+We used the fact that $W_t-W_s$ is independent of the information $\leq s$ thus $E[(W_t-W_s)^2|\mathcal{F}_s] = \mathbb{E}[(W_t-W_s)^2] =\mathbb{E}[(W_{t-s})^2] = t-s$ where the second equality follows from stationarity.
+Note that we will see that there is an alternative way to prove this using Ito's formula: a stochastic process $f(t,W_t)$ is a martingale iff $df/dt = -1/2 df/dW_t$. We can see that for $f(t,W_t) = W^2_t-t$ we have that both sides are equal to $-1$.
+
+We can also check that $W_t$ is no-where differentiable, since $W_{t+dt} -W_{t} = \sqrt{dt}\eta$ where $\eta$ is a Gaussian variables distributed as $\mathcal{N}(0,1)$ (since the difference must be distributed as $\mathcal{N}(0,dt)$). We then have that $lim_{dt \to 0} (W_{t+dt} -W_{t})/dt = \infty$.
+
+$W_t$ is also a Markov process because, for $s>0$, $W_{t+s}-W_{t}$ is independent of $\{W_k\}_{k\leq t}$, thus $E[W_{t+s}-W_{t}|\mathcal{F}_t] = E[W_{t+s}-W_{t}|W_t]$.
+
+
+\subsubsection{List of properties}
+
+We summarise some properties of Wiener processes
+
+\begin{itemize}
+    \item $\mathbb{E}[W_tW_s] = min(s,t)$
+    \item $W_t \sim \mathcal{N}(0,t)$
+    \item $W_t$ is a continous martingale $E[W_t|\mathcal{F}_s] = W_s$ $\forall s\leq t$
+    \item $(W_t)^2-t$ is a martingale
+    \item $W_t$ is nowhere differentiable
+    \item $W_t$ is a Markov process
+    \item Reflection principle: $\mathbb{P}[\max_{0\leq s    \leq t}(B_s) \geq a] = 2\mathbb{P}[B_t > a] = 2 \int_{-\infty}^{a} dx \frac{\exp(-\frac{x^2}{2t})}{\sqrt{2 \pi t}}$
+\end{itemize}
+
+\subsection{Arcsine and Levy distribution}
+
+An important concept is that of stopping time.
+
+First consider the hitting time $\tau = \inf\{t| W_t = x\}$, by \textbf{reflection principle} we have
+
+\begin{equation}
+    \mathbb{P}[\tau\leq t] = 2 \mathbb{P}[W_t \geq x]
+\end{equation}
+
+
+This is proved by noticing that $\mathbb{P}[\tau\leq t, W_t>x] = \mathbb{P}[\tau\leq t, W_t<x]$ since after the hitting time $W_t$ can either be more than $x$ or less than $x$ with equal probability. Thus
+
+\begin{eqnarray}
+    \mathbb{P}[\tau\leq t] &=& \mathbb{P}[\tau\leq t,W_t>x]   + \mathbb{P}[\tau\leq t,W_t<x] \\
+    &=& 2  \mathbb{P}[\tau\leq t,W_t>x] = 2\mathbb{P}[\tau\leq t,W_t\geq x] = 2\mathbb{P}[W_t \geq x]
+\end{eqnarray}
+
+where $\mathbb{P}[\tau\leq t,W_t\geq x] = \mathbb{P}[W_t \geq x]$ because the condition $\tau\leq t$ is automatically satisfied if $W_t\geq x$. 
+The reflection principle can be rephrased as: the reflected stochastic process
+
+\begin{equation}
+    \Tilde{W}_t = 
+    \begin{cases}
+     W_t & t<\tau \\
+     2x-W_t & t\geq \tau
+    \end{cases}
+\end{equation}
+
+is a Wiener process.
+
+Consider the following stopping time $T = argmax_{t \in [0,1]}(W_t)$, we will prove that it follows an arcsine distribution.  Let $S_t = \sup_{t \in [0,1]}W_t$
+
+\begin{equation}
+    \mathbb{P}[T \leq t] = \mathbb{P}[S_{t}>S_{1-t}]
+\end{equation}
+
+since $S_t \sim \mathcal{N}(0,t)$ and $S_{1-t} \sim \mathcal{N}(0,1-t)$ we can rescale $S_t = \sqrt{t}X$ and $S_{1-t} = \sqrt{1-t}Y$ where $X,Y$ are standard Gaussian variables. The constrain can be re-written as
+\begin{equation}
+    \sqrt{t}X>\sqrt{1-t}Y \implies \frac{|Y|}{\sqrt{X^2+Y^2}} \equiv \sin(\theta) <\sqrt{t}   
+\end{equation} 
+
+
+The variable $\theta$ is uniformly distributed along $[-\pi,\pi]$, thus 
+
+\begin{equation}
+    \mathbb{P}[-\pi<\theta <\alpha] = \frac{\alpha+\pi}{2\pi} \implies \mathbb{P}[|\sin(\theta)| <\sqrt{t}] = \frac{2}{\pi} \arcsin(\sqrt{t})
+\end{equation}
+
+
+Furthermore, we can also prove that $\tau$ is a random variable distributed according to a Levy distribution
+\begin{equation}
+    \tau_x = argmin_{t \geq 0}(W_t = x) \sim  f(v; x) =  \frac{x}{\sqrt{2 \pi v^3}}\exp(-\frac{x^2}{2v})\mathds{1}_{v\geq 0} \hspace{5pt}.
+\end{equation}
+
+This is proved using the reflection principle
+
+\begin{equation}
+    \mathbb{P}[\tau_x<t] = 2 \mathbb{P}[W_t>x] = 2 \int_{x}^{\infty}ds \frac{e^{-s^2/2t}}{\sqrt{2\pi t}} = \int_{0}^{t}dyf(y)
+\end{equation}
+
+to find $f(y)$ we can just take one detivative which yields
+
+\begin{equation}
+f(t) = 2 \partial_t  \int_{x}^{\infty}ds \frac{e^{-s^2/2t}}{\sqrt{2\pi t}} = 2 \int_{x}^{\infty}ds \frac{1}{2}\partial^2_{s}\frac{e^{-s^2/2t}}{\sqrt{2\pi t}} = -\partial_{x}\frac{e^{-x^2/2t}}{\sqrt{2\pi t}} = \frac{x e^{-\frac{x^2}{2t}}}{\sqrt{2\pi t^3}}
+\end{equation}
+
+which implies that the hitting time $\tau_x$ is distributed according to a Levy distribution.
+
+We can also prove that $L = \sup\{t \in [0,1]| W_t = 0\}$ is distributed according to an arcsine distribution. $L$ represents the maximum time $t$ when the Wiener process hits zero. The probability that $L<t$ is equal to the probability that a Wiener process initialised at $W_t$ does not hit zero in the remaining time $1-t$: $\mathbb{P}[L<t] = \mathbb{P}[\tau_{W_t}>1-t]$. Hence
+
+\begin{equation}
+    \int_{-\infty}^{\infty}dy \phi(y,t) \mathbb{P}[\tau_y>1-t] = \int_{-\infty}^{\infty}dy \phi(y,t)\int_{1-t}^{\infty} dv \frac{y e^{-\frac{y^2}{2v}}}{\sqrt{2\pi v^3}} = \frac{2}{\pi}\arcsin(\sqrt{t})
+\end{equation}
+
+
+
+
+\subsection{Existence}
+
+The existence of a stochastic process satisfying the three conditions can be proved using Wiener isometry. It is based on realising that $\mathbb{E}[W_tW_s] = min(s,t)$ is similar to $\langle \mathds{1}_{[0,t]},\mathds{1}_{[0,s]} \rangle = min(s,t)$ where $\langle \cdot, \cdot\rangle$ is an inner product in $L^2(\mu)$. We can then construct a map (Wiener isomtetry) $I_{W}$ such that $I_W(\mathds{1}_{[0,t]}) = W_t$. We can then consider a basis in $L^2(\mu)$, $\{\psi_n\}$ and using the fact that for Gaussian variables $\mathbb{E}[\eta_j \eta_k] = \delta_{ij}$ we can assign $I_W(\psi_n) = \eta_n$ thus we have
+
+\begin{equation}
+    W_t = \sum_{i=1}^{\infty} \eta_n \langle \mathds{1}_{[0,t]}, \psi_n\rangle
+\end{equation}
+\subsection{Quadratic variation and covariation}
+
+Let $X_j$ be a stochastic process, then we define the \textbf{quadratic variation} as 
+
+\begin{equation}
+    \langle X\rangle_t = \lim_{n \to \infty} \sum_{j=1}^{tn}\Bigl(X_{j/n}-X_{(j-1)/n} \Bigl)^2
+\end{equation}
+
+For a Wiener process $W_t$ we have
+
+\begin{equation}
+    \langle W \rangle_t = \lim_{n \to \infty} \frac{1}{n}\sum_{j=1}^{tn}\Biggl( \frac{W_{j/n}-W_{(j-1)/n}}{\sqrt{1/n}} \Biggl)^2    
+\end{equation}
+
+the quantity in brakets is a distributed as $\mathcal{N}(0,1)$ hence $\mathbb{E}[\langle W \rangle_t] = t$ and the variance is $Var[\langle W \rangle_t] = \lim_{n \to \infty}2/n = 0$ (using $E[\eta^4]=3$ for Gaussian variables). Therefore, almost surely $\langle W \rangle_t = t$. 
+
+This follows from the fact that if $X$ is a non-negative random variable, $P(X>0) = 1$, and $E[X] = 0$ then $P(X=0)=1$. In other words, a non-negative random variable with a zero expected value is almost surely equal to $0$. In our case, the random variable is $(\langle X \rangle_t-E[\langle X \rangle_t])^2$ which is non-negative and it has zero expectation value.
+
+Similarly, we define the \textbf{quadratic covariation} between two stochastic processes $X_t$ and $Y_t$ as
+\begin{equation}
+    [X,Y]_t = \lim_{n \to \infty} \sum_{j=1}^{tn}\Bigl(X_{j/n}-X_{(j-1)/n} \Bigl)\Bigl(Y_{j/n}-Y_{(j-1)/n} \Bigl) 
+\end{equation}
+
+\subsubsection{Higher dimensions}
+
+We can trivially generalise the Brownian motion in $\mathbb{R}^d$ introducing a vector $W_t = (W^{1}_t,\dots, W^{d}_{t})$ and we impose that $W_t$ is distributed as $\mathcal{N}(0,t \Gamma)$ where $\Gamma_{ij} = E[\eta_i\eta_j] = Cov(\eta_j,eta_i)$ is the covariance matrix. In this case, the quadratic covariation is 
+
+\begin{equation}
+    \langle W^{i}_t,W^{j}_t\rangle = t\Gamma_{ij}
+\end{equation}
+
+
+
+
+\section{Stochastic calculus}
+
+\subsection{Introduction}
+
+Usually in ordrinary calculus one wants to solve ordrinary differential equations of the form 
+
+\begin{equation}
+    dy = f(y,t)dt
+\end{equation}
+
+which is solved by
+
+\begin{equation}
+    y(t) = y_0 + \int_{0}^{t}ds f(y(s),s)
+\end{equation}
+
+we can solve this analytically (sometimes) or numerically via Euler method by descretising time
+\begin{equation}
+    y((n+1)\Delta t) = y_0 + \Delta t f(y(n \Delta t), n\Delta t)
+\end{equation}
+
+Stochastic calculus introduce randomness in the change
+
+\begin{equation}
+    dX_t = m(t,X_t)dt + \sigma(t,X_t)dW_t
+\end{equation}
+
+This is a stochastic differential equation (SDE) which should be interepted as time $t$, $X_t$ is evolving like a Brownian motion with drift $m(t, X_t)$ and variance $\sigma^2(t, X_t)$. We can still have a discretisation of time
+
+\begin{equation}
+    X((n+1)\Delta t) = X_0 + \Delta t m(X(n \Delta t), n\Delta t) + \sqrt{\Delta t} \sigma(X(n \Delta t), n\Delta t)\eta
+\end{equation}
+
+where $\eta \sim \mathcal{N}(0,1)$ is a Gaussian variable. The formal solution to this SDE is
+
+\begin{equation}
+    X_t = X_0 + \int_{0}^tds m(X_s,s) + \int_{0}^tdW_s \sigma(X_s,s)
+\end{equation}
+
+where we need to define the stochastic integral $\int_{0}^tdW_s \sigma(X_s,s)$
+
+
+Notice that sometimes in the physics literature it is written as a Langevin equation
+
+\begin{equation}
+    \dot{X}_t = f(t) + \eta_t
+\end{equation}
+
+and $\eta_t$ is said to be Gaussian white noise with zero mean $\mathbb{E}[\eta_t]=0$ and $\mathbb{E}[\eta_t \eta_s]=\delta(t-s)$. Notice that this is just the following statement in disguise $\mathbb{E}[W_t W_s] = \min(s,t)$ since we have
+
+\begin{equation}
+    \mathbb{E}[W_t W_s] = \int_{0}^tdt'\int_{0}^sds'   \mathbb{E}[dW_{t'} dW_{s'}] = \min(s,t) \implies \mathbb{E}[dW_t dW_s] =\delta(t-s) 
+\end{equation}
+
+Therefore, we can think of a Wiener process as the integral of Gaussian white noise.
+
+
+\subsection{It\^{o} integration}
+
+In this section we define It\^{o} integration which is a prescription to make sense of the expression $\int dW_tX_t$.
+
+\subsubsection{Simple processes}
+
+In ordinary calculus we have a notion of simple function $f$ that can be written as a linear combination of indicator functions over some sets $\{A_k\}$
+\begin{equation}
+    f(x) = \sum_{k}a_k \mathds{1}_{A_k}
+\end{equation} 
+
+then integration is easily defined as 
+
+\begin{equation}
+    \int f d\mu = \sum_{k}a_k \mu(A_k)
+\end{equation}
+
+Simple processes play the same role as simple functions
+
+\begin{equation}
+A_t = \sum_{k=1}^{n} \xi_k  \mathds{1}_{[t_{k-1},t_{k})}   
+\end{equation}
+
+where $0<t_1<t_2 \dots <t_n = t$ and $\xi_k $ is a random variable that is $\mathcal{F}_{t_k}$-measurable.
+We then define
+
+\begin{equation}
+    \int A_sdW_s = \sum_{k = 1}^{n}\xi_i(W_{t_{i+1}}-W_{t_i})
+\end{equation}
+
+This is a It\^{o} integral since the value of the integrand is evalated at the endpoint: $\xi_i(W_{t_{i+1}}-W_{t_i})$, if we evaluate it in the middle i.e. $\xi_i \to 1/2(\xi_i+\xi_{i+1})$ we have a Stratonovich integral.
+
+This integral over a simple process satisfies the following properties
+
+\begin{itemize}
+    \item 
+\textbf{Linearity}. If \(a, b\) are constants, then \(aA_t + bC_t\)
+is also a simple process, and
+\[
+\int_0^t (aA_s + bC_s) dB_s = a \int_0^t A_s dB_s + b \int_0^t C_s dB_s.
+\]
+Moreover, if \(0 < r < t\),
+\[
+\int_0^t A_s dB_s = \int_0^r A_s dB_s + \int_t^r A_s dB_s.
+\]
+\item
+\textbf{Martingale property}. The process
+\[
+Z_t = \int_0^t A_s dB_s
+\]
+is a martingale with respect to \(\{ \mathcal{F}_t \}\).
+\item
+\textbf{Variance rule or It\^{o} isometry}. \(Z_t\) is square integrable, and
+\[
+\text{Var}[Z_t] = \mathbb{E}[Z_t^2] = \int_0^t \mathbb{E}[A_s^2] \, ds.
+\]
+\item
+\textbf{Continuity}. With probability one, the function \( t \mapsto Z_t \) is a continuous function.
+\end{itemize}
+
+We prove the martingale property with $t_{j+1} = s$
+
+\begin{eqnarray}
+    E[Z_t|\mathcal{F}_s] &=& E[Z_s|\mathcal{F}_s] + E[\sum_{k=1}^{j}\xi_{k}(W_{t_{k+1}}-W_{t_{k}})|\mathcal{F}_s]\\
+    &=& Z_s + \sum_{k=1}^{j}E\Bigl[\xi_{k}E[(W_{t_{k+1}}-W_{t_{k}})|\mathcal{F}_{t_{k}}]|\mathcal{F}_s\Bigl] \\
+    &=& Z_s + \sum_{k=1}^{j}E\Bigl[\xi_{k}\mathbb{E}[(W_{t_{k+1}}-W_{t_{k}})]|\mathcal{F}_s\Bigl] = Z_s 
+\end{eqnarray}
+
+where we have used the fact that $\xi_{k}$ is $\mathcal{F}_{t_k}$-measurable and $W_{t_{k+1}}-W_{t_{k}}$ is independent of $\mathcal{F}_{t_{k}}$. Notice that the fact that we are using the endpoint $\xi_{k}$ allows us to pull it out and then use the independence property. If we use the Stratonovich interpratation then we cannot pull $(\xi_{k+1}+\xi_{k})/2$ out of the expectation; hence it is not a martingale.
+
+
+We now show the variance rule
+
+\begin{eqnarray}
+\mathbb{E}[Z_t^2]  &=& \sum_{i=1}^{n}\sum_{j=1}^{n} \mathbb{E}[\xi_i(W_{t_{i+1}}-W_{t_i})\xi_j(W_{t_{j+1}}-W_{t_j})]
+\end{eqnarray}
+
+we use the following trick, if $j>i$ then
+
+\begin{equation}
+    \mathbb{E}[\xi_i(W_{t_{i+1}}-W_{t_i})\xi_j(W_{t_{j+1}}-W_{t_j})]= \mathbb{E}[E[\xi_i(W_{t_{i+1}}-W_{t_i})\xi_j(W_{t_{j+1}}-W_{t_j})|\mathcal{F}_{t_j}]]
+\end{equation}
+
+notice that $\xi_i$, $\xi_j$ $W_{t_{i+1}}-W_{t_{i}}$ are all $\mathcal{F}_{t_j}$-measurable hence they can be pulled out of $E[\cdot |\mathcal{F}_{t_j}]$, wheres $W_{t_{j+1}}-W_{t_{j}}$ is independent of $\mathcal{F}_{t_j}$ hence $E[W_{t_{j+1}}-W_{t_{j}}|\mathcal{F}_{t_j}] = \mathbb{E}[W_{t_{j+1}}-W_{t_{j}}] = \mathbb{E}[W_{t_{j+1}-t_{j}}] = 0$. Thus it is zero, similarly for $i>j$, the only non-zero term is $i=j$ which yields
+
+\begin{eqnarray}
+    \mathbb{E}[Z_t^2] =  \sum_{i=1}^{n}\mathbb{E}[(\xi_i)^2]\mathbb{E}[(W_{t_{i+1}}-W_{t_i})^2] =   \sum_{i=1}^{n}\mathbb{E}[(\xi_i)^2](t_{i+1}-t_i) = \int_{0}^t ds\mathbb{E}[A_s^2]
+\end{eqnarray}
+
+where the last step follows because $A_s$ is a simple process (combination of indicator functions).
+
+
+It is clear that we can approximate any continous process with a sequence of simple process via
+
+\begin{equation}
+    X^{(n)}_t = \sum_{j=0}^{n}X_{t_j}\mathds{1}_{[t_j,t_{j+1})}
+\end{equation}
+
+where $[0,t]$ has been partition in intervals $t_0<t_1<\dots <t_n=t$. When we make the step size of the partition zero it converges in expectation value to $X_t$ thus
+\begin{equation}
+    \lim_{n \to \infty}\int_{0}^tds\mathbb{E}[(X_s-X^{(n)}_s)^2] = 0
+\end{equation}
+
+Hence, we define the stochastic integral for a generic  continuous stochastic process as 
+\begin{equation}
+    \int_{0}^{t} dW_s X_s = \lim_{n \to \infty}\int_{0}^{t} dW_s X^{(n)}_s
+\end{equation}
+
+Given an It\^{o} integral $X_t = \int_{0}^tdW_s\sigma_s$, the quadratic variation is given by
+\begin{equation}
+    \langle X\rangle_t = \int_{0}^tds\sigma^2_s
+\end{equation}
+
+the special case of Brownian motion $W_t = \int_{0}^{t}dW_s$ yields $\langle X\rangle_t = \int_{0}^{t}ds = t$ as previously found. Sometimes it is written in differential form:
+
+\begin{equation}
+    d\langle X\rangle_t = \sigma^2_t dt 
+\end{equation}
+
+Notice that $W_t$ is distributed as a Gaussian $W_t \sim \mathcal{N}(0,t)$, since $Y_t = \int_{0}^tf(s)dW_s$ is a linear combination of $W_t$ we have that $Y_t$ is also  a Gaussian process with $Y_t \sim \mathcal{N}(0, \int_{0}^tf(s)^2ds)$.
+
+\subsubsection{It\^{o} formula}
+
+It\^{o} formula is the analogous of a Taylor series for stochastic function.
+
+We give a first formula valid for Wiener processes
+
+\begin{equation}
+    df(t,W_t) = \frac{\partial f}{\partial t} dt + \frac{\partial f}{\partial W_t} dW_t + \frac{1}{2}\frac{\partial^2 f}{\partial W_t^2} dt
+\end{equation}
+
+The notation ${\partial f}{\partial W_t}$ might be confusing, if $f(t,x)$ is a function then it means $f^{(0,1)}(t,W_t)$.
+
+Let's consider an example $f(W_t) = (W_t)^2$ then we have
+
+\begin{equation}
+    d(W^2_t) = 2W_t dW_t + dt \implies \int_{0}^{t} W_s dW_s = \frac{1}{2}(W^2_t-t)
+\end{equation}
+
+we can see that this does not follow the usual rule of calculus $\int_{0}^{x} ds s = x^2/2$.
+
+
+
+Now assume that a stochastic process $X_t$ satisfies an SDE of the form
+
+\begin{equation}
+dX_t = m(t,X_t)dt + \sigma(t,X_t)dW_t    
+\end{equation}
+
+then $f(t,X_t)$ satisfies
+
+\begin{eqnarray}
+    df(t,X_t) &=&   \frac{\partial f}{\partial t} dt + \frac{\partial f}{\partial W_t} dX_t + \frac{1}{2}\frac{\partial^2 f}{\partial X_t^2} d\langle X\rangle_t \nonumber \\
+    &=& \frac{\partial f}{\partial t} dt + \frac{\partial f}{\partial W_t}\Bigl( m(t,X_t)dt + \sigma(t,X_t)dW_t \Bigl) + \frac{1}{2}\frac{\partial^2 f}{\partial X_t^2} \sigma^2(t,X_t)dt \nonumber \\
+    &=& \Biggl[\frac{\partial f}{\partial t} +\frac{\partial f}{\partial W_t} m(t,X_t) + \frac{1}{2}\frac{\partial^2 f}{\partial X_t^2} \sigma^2(t,X_t)\Biggl]dt + \frac{\partial f}{\partial W_t}\sigma(t,X_t)dW_t
+\end{eqnarray}
+
+Processes that satisfy this type of SDE are known as \textbf{It\^{o} processes}.
+
+\subsubsection{Stochastic product rule}
+We can also formulate the analogue of the product rule $d(fg) = f'g+fg'$. Let $X_t$ and $Y_t$ be stochastic processes, then
+
+\begin{equation}
+    d(X_tY_t) = X_tdY_y+Y_ydX_t + d\langle X, Y\rangle_t
+\end{equation}
+
+
+For example, if $dX_t = f_1(t)dt + g_1(t)dW_t$ and $dY_t = f_2(t)dt + g_2(t)dW_t$, then 
+
+\begin{equation}
+    d(X_tY_t) = \Bigl(X_tf_2(t)+Y_t f_1(t)+ g_1(t) g_2(t)\Bigl)dt + (g_1Y_y+g_2X_t)dW_t
+\end{equation}
+
+
+\subsubsection{Examples}
+\begin{itemize}
+
+    \item Define the geometric Brownian motion with drift $\mu$ and volatility $\sigma$ as
+    \begin{equation}
+        dX_t = \mu X_t dt + \sigma X_t dW_t 
+    \end{equation}
+
+    Solving this SDE requires finding a function $f(t,x)$ sastisfying the system of equations 
+
+    \begin{equation}
+        \begin{cases}
+            \frac{\partial f}{\partial t} + \frac{1}{2}\frac{\partial^2 f}{\partial x^2} = \mu f \\
+        \frac{\partial f}{\partial x}  = \sigma f      
+        \end{cases} \implies f(t,x) = g(t)\exp(\sigma x)
+    \end{equation}
+
+The first equation implies that $g(t)$ should satisfy
+
+\begin{equation}
+    g'(t) + \frac{1}{2}(\sigma)^2g(t) = \mu g(t) \implies g(t) = g(0) \exp\Bigl(\mu t-\frac{1}{2}\sigma^2 t\Bigl)
+\end{equation}
+
+Therefore, the closed form of the geometric Brownian motion is
+\begin{equation}
+    X_t = X_0 \exp\Bigl(\sigma W_t+(\mu-\frac{1}{2}\sigma^2) t\Bigl)
+\end{equation}
+
+Using the fact that $\mathbb{E}[e^{\sigma W_t}] = e^{1/2\sigma^2 t}$ we see that $\mathbb{E}[e^{X_t}] = e^{\mu t}$ so the process is drifting exponentially fast. $X_t$ is distributed according to a log-normal distribution
+
+\begin{equation}
+    f(s) = \frac{1}{\sqrt{2\pi (s\sigma)^2 t}} \exp\Bigl(-\frac{(\log s-\log(X_0)-\mu+\frac{1}{2}\sigma^2)^2}{\sigma^2 t}\Bigl)
+\end{equation}
+
+
+\item  Consider the exponential SDE
+
+\begin{equation}
+    dX_t = A_tX_t dW_t
+\end{equation}
+
+To solve this we use It\^{o}'s formula consider a generic function $X_t = f(t,W_t)$
+
+\begin{equation}
+    df = \Biggl[\frac{\partial f}{\partial t} + \frac{1}{2}\frac{\partial^2 f}{\partial W_t^2}\Biggl]dt + \frac{\partial f}{\partial W_t}dW_t
+\end{equation}
+
+Comparing terms by terms we get the sistem of equations
+
+\begin{equation}
+    \begin{cases}
+        \frac{\partial f}{\partial t} + \frac{1}{2}\frac{\partial^2 f}{\partial W_t^2} = 0 \\
+    \frac{\partial f}{\partial W_t}  = A_t f       
+    \end{cases} \implies f(t,W_t) = g(t)\exp(\int_{0}^{t} A_sdW_s)
+\end{equation}
+
+we then solve for $g(t)$ using the first equation
+
+\begin{equation}
+    \frac{\partial f}{\partial t} + \frac{1}{2}\frac{\partial^2 f}{\partial W_t^2} =  g'(t) + \frac{1}{2}(A_t)^2g(t) = 0   \implies g(t) = g(0)\exp\Bigl(-\frac{1}{2}\int_{0}^{t} dsA^2_s \Bigl)
+\end{equation}
+
+Hence, the solution to the SDE is
+
+\begin{equation}
+    X_t = X_0 \exp\Bigl(\int_{0}^{t} A_sdW_s-\frac{1}{2}\int_{0}^{t} dsA^2_s \Bigl)
+\end{equation}
+\end{itemize}
+
+\subsection{Kolmogorov equations}
+
+\subsubsection{Markov semigroup}
+
+For every Markov process we can define the probability that a process is at $y$ at time $t$ given that at time zero it was at $x$; we denote the density as
+
+\begin{equation}
+    \mathbb{P}[X_t \in dy |X_0=x] = p(t;x,y)dy
+\end{equation}
+
+We focus on time-homogeneous Markov processes for which the transition probability $\mathbb{P}((x,t)\to (x',t'))$ only depends on the time difference (ie. $\mathbb{P}((x,t)\to (x',t')) = p(t'-t;x,y)$).
+
+The density satisfies the Chapman-Kolmogorov equation
+
+\begin{equation}
+p(t;x,y) = \int ds p(t-t';s,y)p(t';x,s)    
+\end{equation}
+
+which is a consequence of Markov properties. It says that the probability density of going from $x \to y$ in time $t$ is obtained by going from $x \to s$ in time $t'$ and then from $s$ to $y$ in the remaining $t-t'$ and we need to sum over all possible values of $s$.
+
+The Chapman-Kolmogorov equation suggest that a \textit{time-homogeneous} Markov process can be described by a semigroup $P_t$ such that $P_0 = I$ and $P_{t} \circ P_{s} = P_{t+s}$ $\forall t,s \geq 0$. We define the action of this semigroup on continous and bounded functions as
+
+\begin{equation}
+    P_t(f)(x) = \int_{\mathbb{R}^d} f(y)p(t;x,y)dy
+\end{equation}
+
+
+The Chapman-Kolmogorov equation implies that
+
+\begin{eqnarray*}
+    P_{t+s}(f)(x) &=& \int_{\mathbb{R}^d} f(y)p(t+s;x,y)dy =  \int_{\mathbb{R}^d}\int_{\mathbb{R}^d} f(y)p(t;x,z)p(s;z,y)dydz\\
+    &=& \int_{\mathbb{R}^d}dzP_{s}(f)(z)p(t;x,z) = (P_t \circ P_s)(f)(x)
+\end{eqnarray*}
+
+Define the generator of the semigroup as an operator $\mathcal{L}$ such that
+
+\begin{equation}
+\mathcal{L}(f) = \lim_{t \to 0} \frac{P_t(f)-f}{t}    
+\end{equation}
+
+this operator is known as the \textbf{generator of the Markov process}; furthermore, it satisfies $P_t = e^{t \mathcal{L}}$. Consider the quantity $u(x,t) = P_t(f)(x)= \mathbb{E}[f(X_t)|X_0= x]$ then it satisfies the differential equation
+
+\begin{equation}
+    \partial_t u(x,t) = \partial_t e^{t \mathcal{L}}f = \mathcal{L}u(x,t)
+\end{equation}
+
+with initial condition $u(x,0) = f(x)$. 
+This equation is known as \textbf{backward Kolmogorov equation}. Notice that we can also define $\tilde{u}(x,s) = \mathbb{E}[f(X_T)|X_s=x]$ where $s \in [0,T]$ and $T$ is fixed. Then using time-homogeneity we have
+
+\begin{equation}
+\tilde{u}(x,s) =  \mathbb{E}[f(X_T)|X_s=x] =   \int_{\mathbb{R}^d} f(y)p(T-s;x,y)dy  
+\end{equation}
+
+which implies that $\partial_T $ is equal to $-\partial_s$; therefore, $u(x,s)$ satisfies
+
+\begin{equation}
+    -\partial_su(x,s) = \mathcal{L}u(x,s)
+\end{equation}
+
+with terminal condition $u(x,t) = f(x)$.
+
+
+Similarly, we can define an operator $P^{\dagger}_t$ that acts on probability measure rather than on bounded function, it is the adjoint ot $P_t$ in the $L^2$ sense.
+
+\begin{equation}
+   \int_{\mathbb{R}^d} P_t(f)(y)d\mu(y) \equiv   \int_{\mathbb{R}^d} f(y)d(P^{\dagger}(\mu)(y))
+\end{equation}
+
+In a similar way we can define a generator $\mathcal{L}^{\dagger}$ such that $P_t = e^{t \mathcal{L}^{\dagger}}$ and the generic measure $\rho(x,t)$ evolves according therefore
+
+\begin{equation}
+    \partial_t \rho(x,t) = \mathcal{L}^{\dagger}\rho(x,t)
+\end{equation}
+
+with initial condition $\rho(x,0) = \rho_0(x)$. When the intial condition is deterministic $X_0=x$ we have $\rho(x,0) = \delta(x)$. This equation is known as \textbf{forward Kolmogorov equation}.
+
+We define a \textbf{Ergodic Markov process} if the generator $\mathcal{L}$ has a zero eigenvalue of algebraic multiplicity $1$, i.e. $\mathcal{L}g = 0$ is solved by $g= \text{const}$ only. This implies that $P_t(g) = g$ has only constant solutions $\forall t \geq 0$ and we can define an invariant measure $\mu$ satisfying 
+
+\begin{equation}
+    P^{\dagger}_t \mu = \mu \implies \mathcal{L}^{\dagger} \rho = 0 \hspace{10pt} d\mu(x) = \rho(x)dx
+\end{equation}
+
+
+This invariant measure determines the long-time behaviour of a random initial condition $X_0$ distributed according to $\mu_0$
+
+\begin{equation}
+    \lim_{t \to \infty}P^{\dagger}_t\mu_0 = \mu
+\end{equation}
+
+we then have the notion of time-average=phase-space average
+
+\begin{equation}
+    \lim_{t \to \infty}\frac{1}{t}\int_{0}^{t} dt'f(X_{t'})dt' = \int d\mu(x) f(x)
+\end{equation}
+
+\subsubsection{Diffusion processes}
+
+Diffusion processes are special cases of Markov processes for which the following properties hold. Let $p(y,t|x,s)$ be the probability that $X_t = y$ given that $X_s = x$
+
+\begin{itemize}
+    \item Continuity: $\forall x, \epsilon$
+    \begin{equation}
+        \int_{|x-y|\leq \epsilon}dyp(y,t|x,s) = o(t-s)
+    \end{equation}
+    \item Drift: there exists $b$ such that $\forall x, \epsilon$
+    \begin{equation}
+        \int_{|x-y|\leq \epsilon}dy(y-x)p(y,t|x,s) = b(x,s)(t-s) + o(t-s)
+    \end{equation}
+    \item Diffusion: there exists $D$ such that $\forall x, \epsilon$
+    \begin{equation}
+            \int_{|x-y|\leq \epsilon}dy(y-x)^2p(y,t|x,s) = \Sigma(x,s)(t-s) + o(t-s)
+    \end{equation}
+\end{itemize}
+
+Then it can be proved that if $X_t$ is a diffusion process then
+
+\begin{itemize}
+    \item \textbf{Backward Kolmogorov equation}: The quantity $u(x,s) = \mathbb{E}[f(X_t)|X_s = x]$ satisfies 
+    \begin{equation}
+    -\partial_s u(x,s) = b(x,s)\partial_xu(x,s) + \frac{1}{2}\Sigma(x,s) \partial^2_xu(x,s)  
+    \end{equation}
+    with terminal condition $u(x,t) = f(x)$. Notice that if we let $f(x) = \delta(x)$, then we have an evolution equation for the probability $p(y,t|x,s)$ in terms of the backward vairables $x,s$
+    \begin{equation}
+        -\partial_s p(y,t|x,s)= b(x,s)\partial_xp(y,t|x,s) + \frac{1}{2}\Sigma(x,s) \partial^2_xp(y,t|x,s) 
+        \end{equation}
+
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Forward Kolmogorov equation}: The quantity $p(y,t|x,s)$ satisfies 
+    \begin{equation}
+    \partial_t p(y,t|x,s) = -\partial_y\Bigl[b(y,t)p(y,t|x,s)\Bigl] + \frac{1}{2} \partial^2_y\Bigl[\Sigma(y,t)p(y,t|x,s)\Bigl]  
+    \end{equation}
+    with initial condition $p(y,s|x,s) = \delta(y-x)$. Notice that this is in terms of the forward variables $y,t$ and it is the adjoint of the backward equation (doing integration by parts and pulling derivatives onto the measure).
+\end{itemize}
+
+\subsubsection{Kramers-Moyal expansion}
+The Fokker-Plank equation is as special case of Kolmogorov forward equation which we now derive using the Kramers-Moyal expansion.
+
+Consider the quantity, for a generic test function $h(y)$
+
+\begin{eqnarray*}
+    \int dyh(y)\partial_t p(t;x,y) &=& \lim_{\Delta t \to 0}\frac{1}{\Delta t}\int dyh(y)p(t+\Delta t;x,y)-p(t;x,y) \\
+    &=&  \lim_{\Delta t \to 0}\frac{1}{\Delta t}\int dyh(y)\Bigl[\int dsp(\Delta t;s,y)p(t; x,s)-p(t;x,y)\Bigl] \\
+    &=& \lim_{\Delta t \to 0}\frac{1}{\Delta t}\int dyds p(t;x,s)p(\Delta t;s,y)\Bigl[h(y)-h(s)\Bigl] \\
+    &=& \lim_{\Delta t \to 0}\frac{1}{\Delta t}\int dyds p(t;x,s)p(\Delta t;s,y)\sum_{n\geq 1}\frac{h^{(n)}(s)}{n!}(y-s)^n
+\end{eqnarray*}
+
+Define the jump moments as 
+
+\begin{equation}
+    D^{(n)}(s) = \lim_{\Delta t \to 0}\frac{1}{\Delta t}\int dyp(\Delta t;s,y)\frac{1}{n!}(y-s)^n    
+\end{equation}
+
+we then have
+
+\begin{eqnarray*}
+    \int dyh(y)\partial_t p(t;x,y) &=&  \int dyds p(t;x,s)\sum_{n\geq 1}D^{(n)}(s)h^{(n)}(s)   \\
+    &=& \int dyds h(s)\sum_{n\geq 1}(-1)^n\partial^{n}_{s}\Bigl[D^{(n)}(s)p(t;x,s)\Bigl]
+\end{eqnarray*}
+
+
+Using the fact that the test function $h(y)$ is arbitrary we obtain the \textbf{Kolmogorov forward equation}
+\begin{equation}
+\partial_t p(t;x,y) =  \sum_{n\geq 1}(-1)^n\partial^{n}_{y}   \Bigl[D^{(n)}(y)p(t;x,y)\Bigl]
+\end{equation}
+
+if we assume that $D^{(n)}(y)=0$ for $n>2$ we get the \textbf{Fokker-Plank equation}
+
+\begin{equation}
+    \partial_t p(t;x,y) =  -\partial_y\Bigl[\mu(y)p(t;x,y)\Bigl]  + \frac{1}{2}\partial^2_y \Bigl[\sigma^2(y)p(t;x,y)\Bigl]
+\end{equation}
+
+where we have defined $D^{(1)}(y) = \mu(y)$ and $D^{(2)}(y) = 1/2 \sigma^2(y)$.
+
+For a It\^{o} process 
+
+\begin{equation*}
+    dX_t = \mu(X_t,t) dt + \sigma(X_t,t) dW_t
+\end{equation*}
+
+
+the Fokker Plank equation is exact and the generator (backward) in $d=1$ is
+
+\begin{equation}
+    \mathcal{L} = \mu(x,t)\partial_x + \frac{1}{2}\sigma^2(x,t)\partial^2_x \equiv \mu(x,t)\partial_x + D(x,t)\partial^2_x
+\end{equation}
+
+where $D$ is the diffusion constant.
+
+Similarly, in $d$ dimensions
+
+\begin{equation}
+    \mathcal{L} = \boldsymbol{\mu}(x,t)\cdot \nabla_x + \frac{1}{2}tr\Bigl(\sigma(x,t) \sigma^{\intercal}(x,t)H\Bigl) \equiv \boldsymbol{\mu}(x,t)\cdot \nabla_x + tr\Bigl(D(x,t)H\Bigl) 
+\end{equation}
+
+where $H_{ij}=\partial_{x_i}\partial_{x_j}$ is the Hessian.
+
+We can now see how the diffusion equation
+
+\begin{equation}
+    \partial_t p(x,t) = D \partial^2_xp(x,t)
+\end{equation}
+
+for a conserved density $p(x,t)$ can be associated to a Ito process of the form
+
+\begin{equation}
+    dX_t = \sqrt{2D}dW_t
+\end{equation}
+
+where $D$ is the diffusion constant, equivalently we notice that $dZ_t \equiv dW_{t\sqrt{2D}} = \sqrt{2D}dW_t$ hence we have that the noise is $dZ_t$ with $\mathbb{E}[dZ_tdZ_s] = 2D\delta(t-s)$ which is sometimes used in physics. 
+
+\subsection{Stratonovich integration}
+
+As we learned, the crucial part of stochastic calculus lies on the interpretation of
+
+\begin{equation}
+    \int_{0}^tdW_tf(t,W_t)
+\end{equation}
+
+currently we interpret it in the It\^{o} sense where for a simple process $A_t$ given by
+
+\begin{equation}
+    A_t = \sum_{k=1}^{n} \xi_k  \mathds{1}_{[t_{k-1},t_{k})}   
+    \end{equation}
+we have
+\begin{equation}
+    \int A_sdW_s = \sum_{k = 1}^{n}\xi_i(W_{t_{i+1}}-W_{t_i})
+\end{equation}
+
+chosing the endpoint $\xi_i$ is the crucial part of It\^{o} integration. However, we have seen that It\^{o} integrals do not follow the usual rules of calculus. Stratonovich integrals try fix this issue so that
+
+\begin{equation}
+\int_0^t f'(W_s)\circ dW_s = f(W_t)-f(W_0)
+\end{equation}
+
+holds.
+
+This is achieved by defining the Stratonovich integral as
+
+\begin{equation}
+    \int_0^t Y_t \circ dX_t = \int_0^t Y_t dX_t + \frac{1}{2}\langle X,Y \rangle_t
+\end{equation}
+
+
+This is achieved by using the midpoint $1/2(\xi_i+\xi_{i+1})$ results in the definition of \textbf{Stratonovich integral} as
+
+\begin{eqnarray}
+    \int A_s \circ dW_s &=& \sum_{k = 1}^{n}\frac{1}{2}(\xi_i+\xi_{i+1})(W_{t_{i+1}}-W_{t_i}) \\
+    &=&\sum_{k = 1}^{n}\xi_i(W_{t_{i+1}}-W_{t_i}) + \sum_{k = 1}^{n}\frac{1}{2}(\xi_{i+1}-\xi_i)(W_{t_{i+1}}-W_{t_i}) \\
+    &\to &\int A_s dW_s + \frac{1}{2}\langle A,W \rangle_t
+\end{eqnarray}
+for a simple process $A_t$. 
+We can see that the extra $\xi_{i+1}$ will disrupt the proof of this integral begin a martingale. In general, Stratonovich integrals are not martingale. Similarly, the variance rule 
+
+\begin{equation}
+    \mathbb{E}[(\int A_sdW_s)^2] = \int \mathbb{E}[A_s^2] ds
+\end{equation}
+
+does not hold for Stratonovich. 
+
+In general, given an It\^{o} process
+
+\begin{equation}
+    dX_t = \mu(X_t,t)dt+\sigma(X_t,t)dW_t
+\end{equation}
+
+we have an equivalent Stratonovich process
+
+\begin{equation}
+    dX_t = \Bigl(\mu(X_t,t)-\frac{1}{2}\sigma'(X_t,t)\sigma(X_t,t)\Bigl)dt+\sigma(X_t,t)\circ dW_t
+\end{equation}
+
+where $\sigma'$ means derivative with respect to the first argument ($X_t$). To prove this we use the definition
+
+\begin{equation}
+    \int_{0}^{t} f(X_s) \circ dW_s = \int_0^t f(X_s) dW_s + \frac{1}{2}\langle f(X),W \rangle_t
+\end{equation}
+
+which in differential form reads
+
+\begin{equation}
+    f(X_t) \circ dW_t =  f(X_t) dW_t  + \frac{1}{2}f'(X_t)\sigma dt
+\end{equation}
+
+For the It\^{o} process we have $f = \sigma$ which yields the previous equation. Notice that we can write the analogue of It\^{o}'s lemma
+
+
+\begin{eqnarray*}
+    df(X_t,t) &=& f'(X_t,t)dX_t + \frac{1}{2}f''(X_t,t)d\langle X\rangle_t\\
+    &=& f'(X_t,t)\sigma dW_t+\Bigl[f'(X_t,t)\mu +\frac{1}{2}\sigma^2f''(X_t,t)\Bigl]dt \\
+    &=& f'(X_t,t)\sigma \circ dW_t + \Bigl[f'(X_t,t)\mu -\frac{1}{2}(f''\sigma+f'\sigma')\sigma+\frac{1}{2}\sigma^2f''(X_t,t)\Bigl]dt  \\
+    &=& f'(X_t,t)\sigma \circ dW_t + \Bigl[f'(X_t,t)\mu -\frac{1}{2}f'\sigma'\sigma\Bigl]dt
+\end{eqnarray*}
+
+Notice that when $X_t = W_t$ (i.e. $\sigma = 1$, $\mu = 0$) we get the usual rule of differentiation
+
+\begin{equation}
+    df(W_t) = f'(W_t)\circ dW_t
+\end{equation}
+
+
+\section{Important (continous) processes}
+This is a section that summarises some results on some important processes
+
+\subsection{Brownian bridge}
+
+Brownian motion, or Wiener process, is a stochastic process that is fixed at $t=0$ (usually $X_0$=0) and the correlation function is $\mathbb{E}[X_tX_s] = \min(s,t)$. A Brownian is a Brownian motion that is fixed at two ends $t=0$ and $t=T$
+
+\begin{equation}
+    B_t = \{W_t |W_T = 0\} \hspace{10pt} t\in [0,T]
+\end{equation}
+
+We can construct an analytic expression for $B_t$
+
+\begin{equation}
+    B_t = W_t - \frac{t}{T}W_{T}
+\end{equation}
+
+Notice that
+
+\begin{equation}
+    \mathbb{E}[B_t] = 0
+\end{equation}
+
+
+\begin{equation}
+    \mathbb{E}[B_tB_{s}] = \min(t,s) + \frac{ts}{T}-\frac{ts}{T}-\frac{st}{T} = \min(s,t)-\frac{st}{T}
+\end{equation}
+
+Thus the Brownian bridge is Gaussian distributed with 
+
+\begin{equation}
+    B_t \sim \mathcal{N}(0, t(1-t/T))
+\end{equation}
+
+Notice that the Brownian bridge can be expressed as
+
+\begin{equation}
+    B_t = \frac{T-t}{\sqrt{T}}W_{t/(T-t)}
+\end{equation}
+
+because $\mathbb{E}[B_t] = 0$ and
+
+\begin{eqnarray}
+ \mathbb{E}[B_tB_s] &=& \frac{(T-t)(T-s)}{T}\min \Bigl(\frac{t}{T-t},\frac{s}{T-s}\Bigl) = \min(t(1-s/T),s(1-t/T)) \nonumber \\ &=& \min(s,t)-st/T 
+\end{eqnarray}
+
+Therefore, they $B_t$ can be re-written as a scaled Brownian motion.
+
+\subsection{Geometric Brownian motion}
+
+Geometric Brownian motion (GBR) is a stochastic process described by the following SDE
+
+\begin{equation}
+    dS_t = \mu S_t dt + \sigma S_t dW_t
+\end{equation}
+
+which can be solved either as done previously (solving a system of differential equations) or by noticing that
+
+\begin{equation}
+    d(\ln S_t) = \frac{dS_t}{S_t}-\frac{1}{2}\frac{(\sigma S_t)^2}{S^2_t}dt = \mu dt + \sigma dW_t-\frac{1}{2}\sigma^2dt
+\end{equation}
+
+which implies
+
+\begin{equation}
+    S_t = S_0\exp \left((\mu- \frac{\sigma^2}{2})t + \sigma W_t \right)
+\end{equation}
+
+This is used to model asset prices since $S_t$ is not negative. $S_t$ is distributed as a log-normal distribution with 
+
+\begin{equation}
+    \mathbb{E}[S_t] = S_0e^{\mu t}
+\end{equation}
+
+and covariance ($s<t$)
+
+\begin{eqnarray}
+    \mathbb{E}[S_tS_s] &=& S_0 e^{(\mu- \frac{\sigma^2}{2})(t+s)}\mathbb{E}[e^{\sigma W_t}e^{\sigma W_s}] = S_0e^{(\mu- \frac{\sigma^2}{2})(t+s)}\mathbb{E}[e^{\sigma(W_t-W_s)}e^{2\sigma W_s}] \nonumber \\
+    &=&  S_0e^{(\mu- \frac{\sigma^2}{2})(t+s)}\mathbb{E}[e^{\sigma(W_t-W_s)}]\mathbb{E}[e^{2\sigma W_s}] = S_0e^{(\mu- \frac{\sigma^2}{2})t}e^{\frac{t-s}{2}\sigma^2}e^{2t\sigma^2} \\ \nonumber
+    &=& S_0e^{(\mu-\frac{\sigma^2}{2})(t+s)+\frac{3t-s}{2}\sigma^2}
+\end{eqnarray}
+
+In general we can write it as
+
+\begin{equation}
+    \mathbb{E}[S_tS_s] = S_0e^{\mu(t+s)+|t-s|\sigma^2}
+\end{equation}
+
+
+\subsection{Ornstein-Uhlenbeck process}
+
+The Ornstein-Uhlenbeck (OU) process satisfies
+
+\begin{equation}
+    dX_t = -\theta X_tdt +  \sigma dW_t
+\end{equation}
+
+the generator (backward) and its adjoint (forwward) are given by
+
+\begin{equation}
+    \mathcal{L} = -\theta x \partial_x + \frac{1}{2}\sigma^2\partial^2_x \hspace{30pt} \mathcal{L}^{\dagger} = \theta \partial_x x + \frac{1}{2}\sigma^2\partial^2_x
+\end{equation}
+
+hence the transition probability density satisfies
+
+\begin{equation}
+\partial_tp(x,t|x',t') = \theta \partial_x xp(x,t|x',t') + \frac{1}{2}\sigma^2\partial^2_x p(x,t|x',t')    
+\end{equation}
+
+with $p(x,t'|x',t') = \delta(x-x')$.
+
+We first solve for $X_t$, the system of equation is given by
+
+\begin{equation}
+    \begin{cases}
+        \frac{\partial f}{\partial t} + \frac{1}{2}\frac{\partial^2 f}{\partial W_t^2} = -\theta f \\
+    \frac{\partial f}{\partial W_t}  = \sigma       
+    \end{cases} \implies f(t,W_t) = \sigma W_t + g(t)
+\end{equation}
+
+
+Plugging into the first equation gives 
+
+
+\begin{equation}
+    \frac{\partial g}{\partial t} = -\theta (\sigma W_t + g(t))    
+\end{equation}
+
+This is solved by integrating factor multiply both sides by h(t)
+
+\begin{equation}
+    h(t)\dot{g} = -\theta  \sigma W_th-\theta gh
+\end{equation}
+
+Comparing with $\dot{(hg)} = \dot{h}g+h\dot{g}$ implies $\theta gh = \dot{h}g \implies f(t) = e^{\theta t}$; hence, $\dot{(hg)} = -\theta \sigma W_t h$ or $g(t) = 1/h(t) \int_{0}^{t}(-\theta \sigma W_s h(s))ds = -\theta \sigma e^{-\theta t}\int_{0}^{t}W_s e^{\theta s}ds$
+
+The solution of the OU process is
+
+\begin{equation}
+    X_t = \sigma W_t -\theta \sigma e^{-\theta t}\int_{0}^{t}ds e^{\theta s}W_s 
+\end{equation}
+
+Notice that if we solve the first equation first, then we have a solution
+
+\begin{equation}
+    X_t = \sigma e^{-\theta t}\int_{0}^{t}dW_s e^{\theta s}
+\end{equation}
+
+these solutions are equivalent since
+
+\begin{equation}
+    d(e^{\theta t}W_t) = \theta e^{\theta t}W_t dt + e^{\theta t}dW_t
+\end{equation}
+
+Since $X_t$ is an integral of $dW_s$ and the integrand does not depend on $W_t$, $X_t$ is distributed as a Gaussian with zero mean and variance 
+
+\begin{equation}
+    \mathbb{E}[X_t^2] = \sigma^2e^{-2 \theta t} \int_{0}^t dse^{2\theta s} = \frac{\sigma^2}{2\theta}(1-e^{- 2\theta t})
+\end{equation}
+
+Similarly the covariance, or \textbf{correlation function}, is given by
+
+\begin{eqnarray}
+    \mathbb{E}[X_tX_s] &=& \sigma^2e^{-\theta(t+s)} \int_{0}^t dt'\int_{0}^{s}ds'e^{\theta (s'+t')} \mathbb{E}[dW_{t'}dW_{s'}] \nonumber \\
+    &=& \sigma^2e^{-\theta(t+s)} \int_{0}^t dt'\int_{0}^{s}ds'e^{\theta (s'+t')} \delta(t'-s') = \sigma^2e^{-\theta(t+s)} \int_{0}^t dt'e^{2\theta t'}\mathds{1}_{[0,s]} \nonumber \\
+    &=& \sigma^2e^{-\theta(t+s)} \frac{1}{2\theta}(e^{2 \theta \min(s,t)}-1) = \frac{\sigma^2}{2 \theta}(e^{-|t-s|}-e^{-\theta(s+t)}) 
+\end{eqnarray}
+
+Notice that when dealing with $\max(s,t)$ or $\min(s,t)$ it is usefull sometimes to use the following properties
+
+\begin{equation}
+    \max(s,t) = \frac{s+t+|s-t|}{2}
+\end{equation}
+
+\begin{equation}
+    \min(s,t) = \frac{s+t-|s-t|}{2}
+\end{equation}
+
+Notice that we should technically write $\mathbb{E}[X_tX_s|X_0 = 0]$ i.e we are certain that at $t=0$ the process is at the origin. However, we can also have the unconditional covariance where we calculate $\lim_{s' \to \infty}\mathbb{E}[X_tX_s|X_s' = 0]$ which changes the lower limit of the integral to $-\infty$ and gives an unconditional correlation function given by
+
+\begin{equation}
+    C(t,s) = \frac{\sigma^2}{2 \theta}e^{-|t-s|}
+\end{equation}
+
+We can write down the transition probability as
+
+\begin{equation}
+    p(x,t|x',t') = \frac{1}{\sqrt{2\pi \frac{\sigma^2}{2\theta}(1-e^{- 2\theta (t-t')})}}\exp\Biggl[-\frac{(x-x')^2}{2\frac{\sigma^2}{2\theta}(1-e^{- 2\theta (t-t')})}\Biggl]
+\end{equation}
+
+which it can be shown to satisfy the appropriate Kolmogorov forward equation (Fokker-Plank). Notice that taking the limit $|t-t'|\to \infty$ yields the invariant measure of the OU process
+
+\begin{equation}
+    p(x) = \frac{1}{\sqrt{2\pi \frac{\sigma^2}{2\theta}}}\exp\Biggl[-\frac{x^2}{2\frac{\sigma^2}{2\theta}}\Biggl]
+\end{equation}
+
+which solves the equation $\mathcal{L}^{\dagger}p = 0$.
+
+The OU process is an example of a Gaussian process with a non-vanishing stationary measure.
+
+\subsection{Cox-Ingersoll-Ross model}
+
+
+\section{Path integral}
+
+\subsection{Feynman-Kac formula}
+
+Consider a It\^{o} process and the following expectation value
+
+\begin{equation}
+    u(x,t) = \mathbb{E}[e^{-\int_0^t V(X_s,s)ds}f(X_t)|X_0=x]
+\end{equation}
+
+then Feynman-Kac fomula says that $u(x,t)$ satisfies the following partial differential equation
+
+\begin{equation}
+    \partial_tu(x,t) = \mu(x,t)\partial_xu(x,t) +\frac{1}{2}\sigma(x,t)\partial^2_xu(x,t)-V(x,t)u(x,t)
+\end{equation}
+
+with initial condition $u(x,0) = f(x)$.
+
+This can be proved by considering the joint process $(X_t,Y_t)$ where 
+
+\begin{equation}
+    Y_t = y-\int_0^t V(X_s,s)ds
+\end{equation}
+
+Writing the differential for both processes
+
+\begin{eqnarray*}
+    dX_t &=& \mu(X_t,t) dt + \sigma(X_t,t) dW_t \hspace{25pt} X_0 = x \\
+    dY_t &=& -V(X_t,t)dt  \hspace{25pt} Y_0=y
+\end{eqnarray*}
+
+The generator $\mathcal{L}_{x,y}$ of this process is given by
+
+\begin{equation}
+    \mathcal{L}_{x,y} = \mu(x,t)\partial_x + \frac{1}{2}\sigma^{2}(x,t)\partial^2_x-V(x,t)\partial_y
+\end{equation}
+
+it follows then that $u(x,y,t) = \mathbb{E}[e^{Y_t}f(X_t)|Y_0 = y,X_0=x]$ satisfies
+
+\begin{equation}
+    \partial_t u(x,y,t) = \mathcal{L}_{x,y}u(x,y,t) = \Biggl[\mu(x,t)\partial_x + \frac{1}{2}\sigma^{2}(x,t)\partial^2_x-V(x,t)\partial_y\Biggl]u(x,y,t)
+\end{equation}
+
+with $u(x,y,0) = e^yf(x)$. Note that $u(x,y,t) = u(x,0,t)e^{y} \equiv u(x,t)e^y$ hence 
+
+\begin{equation}
+    \partial_t u(x,t) =  \Biggl[\mu(x,t)\partial_x + \frac{1}{2}\sigma^{2}(x,t)\partial^2_x-V(x,t)\Biggl]u(x,t)
+\end{equation}
+
+It is interesting to note the similarity with a immaginary-time Schr\"{o}dinger equation (when $\mu=0$) where $V$ is just the potential.
+
+Note that the Feynman-Kac formula can also be found using It\^{o}'s lemma
+
+\begin{eqnarray}
+    d(e^{-\int_{0}^tdsV(X_s)}f(X_t)) &=& \Bigl[e^{-\int_{0}^tdsV(X_s)}\frac{\sigma^2}{2}f''(X_t)+V(X_t)e^{-\int_{0}^tdsV(X_s)}f(X_t)\Bigl]dt \nonumber \\
+    &\phantom{=}& + e^{-\int_{0}^tdsV(X_s)}f'(X_t)dX_t
+\end{eqnarray}
+
+Integrating, taking $\mathbb{E}$ on both sides and using $\mathbb{E}[\int_{0}^t dW_s f(X_s,s)] = 0$, yields the Feynman-Kac formula.
+
+Similarly, can also calculate the following expectation value
+\begin{equation}
+    u(x,t) = \mathbb{E}[e^{-\int_{t}^T V(X_s,s)ds}f(X_T)|X_t=x]
+\end{equation}
+
+for $t\in [0,T]$ where $T$ is fixed. Using time-homogeneity we can write the correpsonding PDE just by changing the sign $\partial_t \to -\partial_t$
+
+\begin{equation}
+    -\partial_t u(x,t) =  \Biggl[\mu(x,t)\partial_x + \frac{1}{2}\sigma^{2}(x,t)\partial^2_x-V(x,t)\Biggl]u(x,t)
+\end{equation}
+
+
+\subsection{Black-Scholes equation}
+
+We can derive a famous equation in finance known as Black-Scholes equation which is used to predict the price of an option.
+An \textbf{option} is a financial derivative that gives the holder the right, but not the obligation, to buy or sell an underlying asset at a predetermined price, known as the \textit{strike price}, on or before a specific date, known as the \textit{expiration date}.
+
+There are two main types of options:
+
+\begin{itemize}
+    \item \textbf{Call Option}: A call option gives the holder the right to \textit{buy} the underlying asset at the strike price.
+    \item \textbf{Put Option}: A put option gives the holder the right to \textit{sell} the underlying asset at the strike price.
+\end{itemize}
+
+How to price an option? In other words, if I tell you the strike price $K$ at time $T$ what is a fair price for this option at time $t$?
+
+Let the price of an \textit{option} be denoted a $V(S_t,t)$ which depends on the underlying asset value $S_t$. We assume that $S_t$ is the price of an asset at time $t$ which follows a GBM
+\begin{equation}
+dS_t = \mu S_t dt + \sigma S_t dW_t    
+\end{equation}
+
+At the maturation time $T$ we either sell/buy the option if there is a gain (otherwise we can do not sell/buy). The gain is $\max(S_T-K,0)$ or $\max(K-S_T,0)$ respectively for call or put options. This is the future value, to get the present value we need to discount it using the continous compounding hence the present value at time $t$ is
+
+\begin{equation}
+    e^{r(T-t)}\max(S_T-K,0)
+\end{equation}
+
+where $r$ is a risk-free interest rate (i.e. the return on a risk-free investement e.g. governement bonds). This discount reflects the idea that money in the future is worth less than money now.
+The expectation value of this quantity is the fair price of the call option
+
+\begin{equation}
+    V(S,t) = \mathbb{E}[e^{r(T-t)}\max(S_T-K,0)|S_t = S]
+\end{equation}
+
+
+The Black-Scholes equation is nothing but the application of the Feynman-Kac formula to this expectation which yields
+
+\begin{equation}
+-\partial_tV(S,t) = \mu S \partial_SV(S,t)+ \frac{1}{2}\sigma^2S^2\partial^2_SV(S,t)- rV(S,t)  
+\end{equation}
+
+usually re-written as follows with $\mu = r$
+
+\begin{equation}
+    \partial_tV(S,t) +r S \partial_SV(S,t)+ \frac{1}{2}\sigma^2S^2\partial^2_SV(S,t)= rV(S,t)  
+    \end{equation}
+
+
+\section{Jump processes}
+
+\section{Fractional Brownian motion}
+
+
+\end{document}
