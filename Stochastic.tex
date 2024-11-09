@@ -311,7 +311,7 @@ This is proved using the reflection principle
     \mathbb{P}[\tau_x<t] = 2 \mathbb{P}[W_t>x] = 2 \int_{x}^{\infty}ds \frac{e^{-s^2/2t}}{\sqrt{2\pi t}} = \int_{0}^{t}dyf(y)
 \end{equation}
 
-to find $f(y)$ we can just take one detivative which yields
+to find $f(y)$ we can just take one derivative which yields
 
 \begin{equation}
 f(t) = 2 \partial_t  \int_{x}^{\infty}ds \frac{e^{-s^2/2t}}{\sqrt{2\pi t}} = 2 \int_{x}^{\infty}ds \frac{1}{2}\partial^2_{s}\frac{e^{-s^2/2t}}{\sqrt{2\pi t}} = -\partial_{x}\frac{e^{-x^2/2t}}{\sqrt{2\pi t}} = \frac{x e^{-\frac{x^2}{2t}}}{\sqrt{2\pi t^3}}
@@ -365,6 +365,9 @@ We can trivially generalise the Brownian motion in $\mathbb{R}^d$ introducing a 
 \begin{equation}
     \langle W^{i}_t,W^{j}_t\rangle = t\Gamma_{ij}
 \end{equation}
+
+
+
 
 
 
@@ -1171,8 +1174,92 @@ which solves the equation $\mathcal{L}^{\dagger}p = 0$.
 
 The OU process is an example of a Gaussian process with a non-vanishing stationary measure.
 
-\subsection{Cox-Ingersoll-Ross model}
+\subsection{Vasiceck and Cox-Ingersoll-Ross models}
 
+The Vasiceck model and the CIR models descre the evolution of interest rates.
+
+The Vasiceck model is
+
+\begin{equation*}
+    dr_t = a(b-r_t)dt + \sigma dW_t
+\end{equation*}
+
+where 
+
+\begin{itemize}
+    \item $r_t$ is the interest rate at time $t$
+    \item $b$ is the value at which the interest rate tends to at infinite time
+    \item $a$ is the speed at which the limit $b$ is achieved
+\end{itemize}
+
+Vasiceck model shows mean reversion: the tendency that an asset's price will tend to converge to the average price over time.
+
+It can be solved explicitly
+
+\begin{equation}
+    \begin{cases}
+        \frac{\partial f}{\partial t} + \frac{1}{2}\frac{\partial^2 f}{\partial W_t^2} = a(b-f)\\
+    \frac{\partial f}{\partial W_t}  = \sigma       
+    \end{cases} \implies f(t,W_t) = \sigma W_t + g(t)
+\end{equation}
+
+and 
+
+\begin{equation*}
+    g'(t) = a(b-\sigma W_t-g(t))
+\end{equation*}
+
+note that we cannot separate this equation since $W_t$ is time-dependent. We need to use an integrating factor $h(t)$
+
+\begin{equation*}
+g'(t)f(t)+af(t)g(t) = a(b-\sigma W_t)f(t)    
+\end{equation*}
+
+we want to force the LHS to be of the form $d/dt(g(t)f(t))$; hence, $f'(t) = a f(t)$ or $f(t) = e^{at}$ 
+
+\begin{equation*}
+    \frac{d}{dt}(g(t)e^{at}) = e^{at}a(b-\sigma W_t)
+\end{equation*}
+
+which is solved by
+
+\begin{equation*}
+    g(t) = g(0)e^{-at} + b(1-e^{-at}) - a \sigma e^{-at} \int_0^tdse^{as}W_s
+\end{equation*}
+
+the last integral can be simplified using
+
+\begin{equation*}
+    d(e^{at}W_t) = ae^{at}W_tdt+e^{at}dW_t
+\end{equation*}
+
+Hence
+
+\begin{equation*}
+    r_t = f(W_t,t) = \sigma W_t + g(t) = g(0)e^{-at} + b(1-e^{-at}) - \sigma e^{-at} \int_0^tdW_se^{as}
+\end{equation*}
+
+The expectation value is
+
+\begin{equation*}
+\mathbb{E}[r_t] =  g(0)e^{-at} + b(1-e^{-at}) \to b \hspace{20pt} t \to \infty
+\end{equation*}
+
+the correlation is
+
+\begin{equation*}
+\mathbb{E}[r_tr_s] -\mathbb{E}[r_t]\mathbb{E}[r_s] = \frac{\sigma^2}{2 a}(e^{-|t-s|}-e^{-a(s+t)})
+\end{equation*}
+
+A drawback of this model is that $r_t$ could be negative for some realisations. 
+
+This is fixed by the CIR model given by
+
+\begin{equation*}
+    dr_t = a(b-r_t)dt + \sigma \sqrt{r_t}dW_t
+\end{equation*}
+
+This model has no closed form solution.
 
 \section{Path integral}
 
@@ -1292,9 +1379,36 @@ usually re-written as follows with $\mu = r$
     \end{equation}
 
 
-\section{Jump processes}
-
 \section{Fractional Brownian motion}
+
+Fractional Brownian Motion (fBM) is a stochastic process that serves as a generalisation of standard Brownian Motion with a parameter \( H \in (0, 1) \) (Hurst parameter). It is denoted as \( W^H(t) \) and has the following properties:
+
+\begin{itemize}
+    \item \( W^H(0) = 0 \)
+    \item \( W^H(t) \) has almost surely continuous paths
+    \item \( W^H(t) \) is a Gaussian process with mean zero: \( \mathbb{E}[W^H(t)] = 0 \)
+    \item The covariance of \( W^H(t) \) is given by:
+    \[
+    \mathbb{E}[W^H(t) W^H(s)] = \frac{1}{2} \left( t^{2H} + s^{2H} - |t - s|^{2H} \right)
+    \]
+     \item \( W^H(t) \) has the scaling property: \( W^H(t) \sim c^{H}W^{H}(ct) \)
+     \item $W^{H}(t)$ has stationary increments: $W^{H}(t)-W^{H}(s) \sim \mathcal{N}(0,|t-s|^{2H})$
+\end{itemize}
+
+
+Note that when \( H = \frac{1}{2} \), \( W^{H}(t) \) reduces to standard Brownian Motion since 
+
+\begin{equation}
+    \mathbb{E}[W^{1/2}(t) W^{1/2}(s)] = \frac{1}{2} \left( t + s - |t - s| \right) = \min(s,t)
+\end{equation}
+
+One way to simulate (fBM) is by defining the matrix
+
+\begin{equation*}
+    \Gamma_{ij} = \mathbb{E}[W^{H}(i\cdot dt) W^{H}(j \cdot dt)]
+\end{equation*}
+
+where $dt$ is the time-step. We then take the square root of this matrix $\Sigma = \sqrt{\Gamma}$ and this gives a covariance-matrix. We then multiply this matrix with a Gaussian vector $v$ drawn from $\mathcal{N}(0,I_{n})$, where $n$ is the total number of steps.
 
 
 \end{document}
